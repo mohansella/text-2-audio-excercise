@@ -1,7 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:text_2_audio_excercise/pages/play.dart';
+import 'package:text_2_audio_excercise/utils/notify.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,24 +17,39 @@ class _HomePageState extends State<HomePage> {
   final String storeKey = "text";
 
   @override
-  void initState() { 
+  void initState() {
     super.initState();
-    _load();
+    _load(null);
   }
 
-  Future<void> _load() async{
+  Future<void> _load(BuildContext? context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var text = prefs.getString(storeKey);
-    debugPrint('text is $text ');
+    debugPrint('loaded text: $text ');
     if (text != null) {
       textController.text = text;
+      if (context != null && context.mounted) {
+        NotifyUtil.notifyInfo(context, "loaded text successfully");
+      }
     }
   }
 
-  Future<void> _save() async{
+  Future<void> _save(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    debugPrint("saving text ${textController.text} ");
+    debugPrint("saving text: ${textController.text} ");
     prefs.setString(storeKey, textController.text);
+    if (context.mounted) {
+      NotifyUtil.notifyInfo(context, "saved text successfully");
+    }
+  }
+
+  String _hint() {
+    return "Express your excercise in the pattern below\n"
+        "Rounds TimeInSeconds Name\n"
+        "\n"
+        "Example below\n"
+        "3r 30s 30i Planks\n"
+        "3r 30s 10i Child Pose\n";
   }
 
   @override
@@ -52,12 +67,12 @@ class _HomePageState extends State<HomePage> {
               TextButton.icon(
                 label: const Text("Load"),
                 icon: const Icon(Icons.open_in_browser),
-                onPressed: _load,
+                onPressed: () => {_load(context)},
               ),
               TextButton.icon(
                 label: const Text("Save"),
                 icon: const Icon(Icons.save),
-                onPressed: _save,
+                onPressed: () => {_save(context)},
               ),
             ],
           ),
@@ -66,20 +81,19 @@ class _HomePageState extends State<HomePage> {
             maxLines: null,
             minLines: 8,
             keyboardType: TextInputType.multiline,
-            decoration: const InputDecoration(
-                hintText:
-                    "Express your excercise in the pattern below\nRounds TimeInSeconds Name\n\nExample below,\n3 20 Planks\n3 20 Child Pose"),
+            decoration: InputDecoration(hintText: _hint()),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           var text = textController.text;
-          Navigator.push(context, MaterialPageRoute(builder: (context) => PlayPage(text: text)));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => PlayPage(text: text)));
         },
         tooltip: "Play",
         child: const Icon(Icons.play_arrow),
-      ), 
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }

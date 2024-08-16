@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:text_2_audio_excercise/utils/notify.dart';
 
 class PlayPage extends StatefulWidget {
@@ -28,6 +29,12 @@ class _PlayPageState extends State<PlayPage> {
   void initState() {
     _parse();
     super.initState();
+  }
+
+  @override
+  void deactivate() {
+    uniqueId++;
+    super.deactivate();
   }
 
   void _parse() {
@@ -120,12 +127,10 @@ class _PlayPageState extends State<PlayPage> {
                 round = j;
               });
             }
-            var said = _say("round ${j + 1}", currId);
+            await _say("round ${j + 1}", currId);
             await Future.delayed(Duration(seconds: currExcercise.duration));
-            await said;
-            said = _say("rest", currId);
+            await _say("rest", currId);
             await Future.delayed(Duration(seconds: currExcercise.interval));
-            await said;
           }
           if (currId == uniqueId) {
             setState(() {
@@ -157,6 +162,7 @@ class _PlayPageState extends State<PlayPage> {
       throw "uniqueId invalidated";
     }
     debugPrint("saying: $text");
+    await FlutterTts().speak(text);
   }
 
   @override
@@ -193,7 +199,9 @@ class _PlayPageState extends State<PlayPage> {
                           ? "Rest"
                           : (isPlaying ? "Round ${round + 1}" : "Paused"),
                       style: const TextStyle(fontSize: 30)),
-                  Text("duration:${currExcercise.duration} seconds")
+                  Text(isPlaying
+                      ? "duration:${isRest ? currExcercise.interval : currExcercise.duration} seconds"
+                      : "")
                 ],
               ))),
           Expanded(

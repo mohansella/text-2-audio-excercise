@@ -76,12 +76,15 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-          TextField(
-            controller: textController,
-            maxLines: null,
-            minLines: 8,
-            keyboardType: TextInputType.multiline,
-            decoration: InputDecoration(hintText: _hint()),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: textController,
+              maxLines: null,
+              minLines: 8,
+              keyboardType: TextInputType.multiline,
+              decoration: InputDecoration(hintText: _hint()),
+            ),
           ),
         ],
       ),

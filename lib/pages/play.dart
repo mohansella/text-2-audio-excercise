@@ -121,6 +121,7 @@ class _PlayPageState extends State<PlayPage> {
       try {
         for (int i = currExcerciseNum; i < excercises.length; i++) {
           await _say(currExcercise.name, currId);
+          await Future.delayed(const Duration(seconds: 1));
           for (int j = round; j < currExcercise.rounds; j++) {
             if (currId == uniqueId) {
               setState(() {
